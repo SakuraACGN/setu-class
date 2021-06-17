@@ -14,9 +14,6 @@ app = Flask(__name__)
 MAXBUFFSZ = 16*1024*1024
 server_uid = 0
 
-init_dll_in('/usr/local/lib/')
-init_model(TRAINED_MODEL)
-
 def get_arg(key: str) -> str:
 	return request.args.get(key)
 
@@ -65,6 +62,8 @@ def handle_client():
 	if img_dir[-1] != '/': img_dir += "/"
 	server_uid = int(sys.argv[4]) if len(sys.argv) == 5 else 0
 	print("Starting SC at:", host, port)
+	init_dll_in('/usr/local/lib/')
+	init_model(TRAINED_MODEL)
 	pywsgi.WSGIServer((host, port), app).serve_forever()
 
 if __name__ == '__main__':
