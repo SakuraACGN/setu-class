@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from base14.base14 import init_dll_in
-from gevent import pywsgi, server
+from gevent import pywsgi
 from flask import Flask, request
 from urllib.request import unquote, quote
 import sys, os
