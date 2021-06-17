@@ -74,7 +74,9 @@ def tta_predict_files(imgs):
 def predict_url(url):
 	global model, pool
 	r = pool.request('GET', url, preload_content=False)
+	print("Get request.")
 	d = r.read()
+	print("Read success.")
 	with Image.open(BytesIO(d)).convert('RGB') as img:
 		imgt = get_test_transform(size=cfg.INPUT_SIZE)(img).unsqueeze(0)
 		if torch.cuda.is_available(): imgt = imgt.cuda()
@@ -85,6 +87,7 @@ def predict_url(url):
 			img.save(converted, "WEBP")
 			converted.seek(0)
 			d = converted.read()
+			print("Convert success.")
 		return int(torch.argmax(out, dim=1).cpu().item()), d
 
 def predict_data(dataio):
