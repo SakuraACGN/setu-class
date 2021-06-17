@@ -13,12 +13,14 @@ from img import get_dhash_b14, save_img
 app = Flask(__name__)
 MAXBUFFSZ = 16*1024*1024
 server_uid = 0
+img_dir = ""
 
 def get_arg(key: str) -> str:
 	return request.args.get(key)
 
 @app.route("/dice", methods=['GET'])
 def dice() -> dict:
+	global img_dir
 	c, d = predict_url(unquote(get_arg("url")))
 	if len(d) > 0:
 		dh = get_dhash_b14(d)
@@ -55,7 +57,7 @@ def flush_io() -> None:
 	sys.stderr.flush()
 
 def handle_client():
-	global server_uid
+	global server_uid, img_dir
 	host = sys.argv[1]
 	port = int(sys.argv[2])
 	img_dir = sys.argv[3]
