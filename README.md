@@ -8,6 +8,7 @@ Setu classification.
 
 1. The classification is returned in headers, which named `Class`.
 2. The http content is a webp image.
+3. There are also a `DHash` value returned in headers and being encoded by `base16384`.
 
 #### 2. Classify posted data
 > /classdat

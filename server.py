@@ -2,7 +2,7 @@
 from base14.base14 import init_dll_in
 from gevent import pywsgi
 from flask import Flask, request
-from urllib.request import unquote
+from urllib.request import unquote, quote
 import sys, os
 from base14 import init_dll_in
 from classify import init_model, predict_data, predict_url
@@ -23,7 +23,7 @@ def get_arg(key: str) -> str:
 def dice() -> dict:
 	c, d = predict_url(unquote(get_arg("url")))
 	if len(d) > 0:
-		return d, 200, {"Content-Type": "image/webp", "Class": c}
+		return d, 200, {"Content-Type": "image/webp", "Class": c, "DHash": quote(get_dhash_b14(d))}
 
 @app.route("/classdat", methods=['POST'])
 def upload() -> dict:
