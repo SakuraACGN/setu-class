@@ -12,7 +12,6 @@ from img import get_dhash_b14, save_img
 
 app = Flask(__name__)
 MAXBUFFSZ = 16*1024*1024
-BLOCK_REQUEST = False
 
 init_dll_in('/usr/local/lib/')
 init_model(TRAINED_MODEL)
@@ -22,17 +21,11 @@ def get_arg(key: str) -> str:
 
 @app.route("/dice", methods=['GET'])
 def dice() -> dict:
-	global BLOCK_REQUEST
-	if BLOCK_REQUEST:
-		return "404 NOT FOUND", 404
-	else:
-		BLOCK_REQUEST = True
-		c, d = predict_url(unquote(get_arg("url")))
-		BLOCK_REQUEST = False
-		if len(d) > 0:
-			dh = get_dhash_b14(d)
-			save_img(d, img_dir)
-			return d, 200, {"Content-Type": "image/webp", "Class": c, "DHash": quote(dh)}
+	c, d = predict_url(unquote(get_arg("url")))
+	if len(d) > 0:
+		dh = get_dhash_b14(d)
+		save_img(d, img_dir)
+		return d, 200, {"Content-Type": "image/webp", "Class": c, "DHash": quote(dh)}
 
 @app.route("/classdat", methods=['POST'])
 def upload() -> dict:
