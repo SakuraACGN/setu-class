@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from base14.base14 import init_dll_in
-from gevent import pywsgi
+from gevent import pywsgi, server
 from flask import Flask, request
 from urllib.request import unquote, quote
 import sys, os
@@ -12,6 +12,7 @@ from img import get_dhash_b14, save_img
 
 app = Flask(__name__)
 MAXBUFFSZ = 16*1024*1024
+server_uid = 0
 
 init_dll_in('/usr/local/lib/')
 init_model(TRAINED_MODEL)
@@ -48,16 +49,46 @@ def upform() -> dict:
 
 @app.before_first_request
 def setuid() -> None:
+	global server_uid
 	if server_uid > 0:		#监听后降权
 		os.setuid(server_uid)
 
+def flush_io() -> None:
+	sys.stdout.flush()
+	sys.stderr.flush()
+
+def handle_client():
+	global server_uid
+	host = sys.argv[1]
+	port = int(sys.argv[2])
+	img_dir = sys.argv[3]
+	if img_dir[-1] != '/': img_dir += "/"
+	server_uid = int(sys.argv[4]) if len(sys.argv) == 5 else 0
+	print("Starting SC at:", host, port)
+	pywsgi.WSGIServer((host, port), app).serve_forever()
+
 if __name__ == '__main__':
 	if len(sys.argv) == 4 or len(sys.argv) == 5:
-		host = sys.argv[1]
-		port = int(sys.argv[2])
-		img_dir = sys.argv[3]
-		if img_dir[-1] != '/': img_dir += "/"
-		server_uid = int(sys.argv[4]) if len(sys.argv) == 5 else 0
-		print("Starting SC at:", host, port)
-		pywsgi.WSGIServer((host, port), app).serve_forever()
+		if os.fork() == 0:		#创建daemon
+			os.setsid()
+			#创建孙子进程，而后子进程退出
+			if os.fork() > 0: sys.exit(0)
+			#重定向标准输入流、标准输出流、标准错误
+			flush_io()
+			si = open("/dev/null", 'r')
+			so = open("./log.txt", 'w')
+			se = open("./log_err.txt", 'w')
+			os.dup2(si.fileno(), sys.stdin.fileno())
+			os.dup2(so.fileno(), sys.stdout.fileno())
+			os.dup2(se.fileno(), sys.stderr.fileno())
+			pid = os.fork()
+			while pid > 0:			#监控服务是否退出
+				#signal(SIGCHLD, SIG_IGN)
+				#signal(SIGPIPE, SIG_IGN)		# 忽略管道错误
+				os.wait()
+				print("Subprocess exited, restarting...")
+				pid = os.fork()
+			if pid < 0: print("Fork error!")
+			else: handle_client()
+		else: print("Creating daemon...")
 	else: print("Usage: <host> <port> <img_dir> (server_uid)")

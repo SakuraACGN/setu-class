@@ -5,7 +5,6 @@
 # @github : https://github.com/lxztju
 
 from io import BytesIO
-from flask import config
 import torch
 import os
 from PIL import Image

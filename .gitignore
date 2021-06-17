@@ -131,3 +131,5 @@ dmypy.json
 .DS_Store
 trained/*
 imgs
+log.txt
+log_err.txt
