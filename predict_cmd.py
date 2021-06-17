@@ -1,14 +1,14 @@
-import predict as p
+from classify import init_model, predict_url, predict_files
+from config import TRAINED_MODEL
+import pandas as pd
 import sys
 
 if __name__ == "__main__":
-	if len(sys.argv) >= 2:
-		trained_model = p.cfg.TRAINED_MODEL
-		model_name = p.cfg.model_name
-		p.imgs = sys.argv[1:]
-
-		# _id, pred_list = tta_predict(trained_model)
-		_id, pred_list = p.predict(trained_model)
-
-		submission = p.pd.DataFrame({"ID": _id, "Label": pred_list})
-		print(submission.to_string())
+	if len(sys.argv) >= 3:
+		init_model(TRAINED_MODEL)
+		if sys.argv[1] == "url":
+			print(predict_url(sys.argv[2]))
+		elif sys.argv[1] == "imgs":
+			_id, pred_list = predict_files(sys.argv[2:])
+			submission = pd.DataFrame({"ID": _id, "Label": pred_list})
+			print(submission.to_string())
