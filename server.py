@@ -12,6 +12,7 @@ from img import get_dhash_b14, save_img
 
 app = Flask(__name__)
 MAXBUFFSZ = 16*1024*1024
+BLOCK_REQUEST = False
 
 init_dll_in('/usr/local/lib/')
 init_model(TRAINED_MODEL)
@@ -21,22 +22,28 @@ def get_arg(key: str) -> str:
 
 @app.route("/dice", methods=['GET'])
 def dice() -> dict:
-	c, d = predict_url(unquote(get_arg("url")))
-	if len(d) > 0:
-		dh = get_dhash_b14(d)
-		save_img(d, img_dir)
-		return d, 200, {"Content-Type": "image/webp", "Class": c, "DHash": quote(dh)}
+	global BLOCK_REQUEST
+	if BLOCK_REQUEST:
+		return "404 NOT FOUND", 404
+	else:
+		BLOCK_REQUEST = True
+		c, d = predict_url(unquote(get_arg("url")))
+		BLOCK_REQUEST = False
+		if len(d) > 0:
+			dh = get_dhash_b14(d)
+			save_img(d, img_dir)
+			return d, 200, {"Content-Type": "image/webp", "Class": c, "DHash": quote(dh)}
 
 @app.route("/classdat", methods=['POST'])
 def upload() -> dict:
-		length = int(request.headers.get('Content-Length'))
-		print("准备接收:", length, "bytes")
-		if length < MAXBUFFSZ:
-			data = request.get_data()
-			return {"img": get_dhash_b14(data), "class": predict_data(BytesIO(data))}
-		else:
-			data = request.stream.read(length)
-			return {"img": get_dhash_b14(data), "class": predict_data(BytesIO(data))}
+	length = int(request.headers.get('Content-Length'))
+	print("准备接收:", length, "bytes")
+	if length < MAXBUFFSZ:
+		data = request.get_data()
+		return {"img": get_dhash_b14(data), "class": predict_data(BytesIO(data))}
+	else:
+		data = request.stream.read(length)
+		return {"img": get_dhash_b14(data), "class": predict_data(BytesIO(data))}
 
 @app.route("/classform", methods=['POST'])
 def upform() -> dict:
