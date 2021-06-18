@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from base14.base14 import init_dll_in
-from quart import Quart, request
+from gevent import pywsgi
+from flask import Flask, request
 from urllib.request import unquote, quote
 import sys, os
 from base14 import init_dll_in
@@ -9,7 +10,8 @@ from config import TRAINED_MODEL
 from io import BytesIO
 from img import get_dhash_b14, save_img
 
-app = Quart(__name__)
+app = Flask(__name__)
+MAXBUFFSZ = 16*1024*1024
 server_uid = 0
 img_dir = ""
 
@@ -17,7 +19,7 @@ def get_arg(key: str) -> str:
 	return request.args.get(key)
 
 @app.route("/dice", methods=['GET'])
-async def dice() -> dict:
+def dice() -> dict:
 	global img_dir
 	c, d = predict_url(unquote(get_arg("url")))
 	if len(d) > 0:
@@ -27,9 +29,15 @@ async def dice() -> dict:
 		return d, 200, {"Content-Type": "image/webp", "Class": c, "DHash": quote(dh)}
 
 @app.route("/classdat", methods=['POST'])
-async def upload() -> dict:
-	data = await request.get_data()
-	return {"img": get_dhash_b14(data), "class": predict_data(BytesIO(data))}
+def upload() -> dict:
+	length = int(request.headers.get('Content-Length'))
+	print("准备接收:", length, "bytes")
+	if length < MAXBUFFSZ:
+		data = request.get_data()
+		return {"img": get_dhash_b14(data), "class": predict_data(BytesIO(data))}
+	else:
+		data = request.stream.read(length)
+		return {"img": get_dhash_b14(data), "class": predict_data(BytesIO(data))}
 
 @app.route("/classform", methods=['POST'])
 def upform() -> dict:
@@ -58,7 +66,7 @@ def handle_client():
 	print("Starting SC at:", host, port)
 	init_dll_in('/usr/local/lib/')
 	init_model(TRAINED_MODEL)
-	app.run(host, port)
+	pywsgi.WSGIServer((host, port), app).serve_forever()
 
 if __name__ == '__main__':
 	if len(sys.argv) == 4 or len(sys.argv) == 5:
