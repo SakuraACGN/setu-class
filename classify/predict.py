@@ -80,7 +80,6 @@ def predict_url(url):
 		imgt = get_test_transform(size=cfg.INPUT_SIZE)(img).unsqueeze(0)
 		if torch.cuda.is_available(): imgt = imgt.cuda()
 		with torch.no_grad(): out = model(imgt)
-		r.release_conn()
 		if img.format != "WEBP":
 			converted = BytesIO()
 			img.save(converted, "WEBP")
