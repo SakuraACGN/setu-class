@@ -12,6 +12,7 @@ from img import get_dhash_b14, save_img
 app = Quart(__name__)
 server_uid = 0
 img_dir = ""
+save_image = False
 
 def get_arg(key: str) -> str:
 	return request.args.get(key)
@@ -22,8 +23,9 @@ async def dice() -> dict:
 	c, d = predict_url(unquote(get_arg("url")))
 	if len(d) > 0:
 		dh = get_dhash_b14(d)
-		save_img(d, img_dir)
-		print("Save success.")
+		if save_image:
+			save_img(d, img_dir)
+			print("Save success.")
 		return d, 200, {"Content-Type": "image/webp", "Class": c, "DHash": quote(dh)}
 
 @app.route("/classdat", methods=['POST'])
@@ -49,19 +51,21 @@ def flush_io() -> None:
 	sys.stderr.flush()
 
 def handle_client():
-	global server_uid, img_dir
+	global server_uid, img_dir, save_image
 	host = sys.argv[1]
 	port = int(sys.argv[2])
-	img_dir = sys.argv[3]
-	if img_dir[-1] != '/': img_dir += "/"
-	server_uid = int(sys.argv[4]) if len(sys.argv) == 5 else 0
+	save_image = sys.argv[3] == "true"
+	if save_image:
+		img_dir = sys.argv[4]
+		if img_dir[-1] != '/': img_dir += "/"
+	else: server_uid = int(sys.argv[4])
 	print("Starting SC at:", host, port)
 	init_dll_in('/usr/local/lib/')
 	init_model(TRAINED_MODEL)
 	app.run(host, port)
 
 if __name__ == '__main__':
-	if len(sys.argv) == 4 or len(sys.argv) == 5:
+	if len(sys.argv) == 4:
 		'''
 		if os.fork() == 0:		#创建daemon
 			os.setsid()
@@ -87,4 +91,4 @@ if __name__ == '__main__':
 		else: print("Creating daemon...")
 		'''
 		handle_client()
-	else: print("Usage: <host> <port> <img_dir> (server_uid)")
+	else: print("Usage: <host> <port> <save_img:true/false> (img_dir/server_uid)")
