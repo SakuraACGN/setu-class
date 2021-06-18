@@ -73,7 +73,7 @@ def handle_client():
 	pywsgi.WSGIServer((host, port), app).serve_forever()
 
 if __name__ == '__main__':
-	if len(sys.argv) == 4:
+	if len(sys.argv) == 5:
 		'''
 		if os.fork() == 0:		#创建daemon
 			os.setsid()
