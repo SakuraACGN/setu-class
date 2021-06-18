@@ -73,8 +73,10 @@ def tta_predict_files(imgs):
 
 last_req_time = 0
 def predict_url(url):
-	global model, pool
-	if time() - last_req_time > 60: pool.clear()
+	global model, pool, last_req_time
+	if time() - last_req_time > 60:
+		pool.clear()
+		last_req_time = time()
 	r = pool.request('GET', url, preload_content=False)
 	print("Get request.")
 	d = r.read()
