@@ -13,6 +13,7 @@ from collections import Counter
 from config import cfg
 from data import tta_test_transform, get_test_transform
 from urllib3 import PoolManager
+from time import time
 
 model = ""
 pool = PoolManager()
@@ -70,11 +71,14 @@ def tta_predict_files(imgs):
 			pred_list.append(res)
 	return _id, pred_list
 
+last_req_time = 0
 def predict_url(url):
 	global model, pool
+	if time() - last_req_time > 60: pool.clear()
 	r = pool.request('GET', url, preload_content=False)
 	print("Get request.")
 	d = r.read()
+	r.release_conn()
 	print("Read success.")
 	with Image.open(BytesIO(d)).convert('RGB') as img:
 		imgt = get_test_transform(size=cfg.INPUT_SIZE)(img).unsqueeze(0)

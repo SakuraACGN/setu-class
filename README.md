@@ -11,9 +11,13 @@ python3 server(_flask).py <host> <port> <save_img:true/false> (img_dir/server_ui
 #### 1. Dice from url
 > /dice?url=http://random.api.url
 
+> optional: noimg=true
+
+
 1. The classification is returned in headers, which named `Class`.
 2. The http content is a webp image.
 3. There are also a `DHash` value returned in headers and being encoded by `base16384`.
+4. If noimg=true is set, the server will only return json in API 2.
 
 #### 2. Classify posted data
 > /classdat

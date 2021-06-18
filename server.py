@@ -21,12 +21,14 @@ def get_arg(key: str) -> str:
 async def dice() -> dict:
 	global img_dir
 	c, d = predict_url(unquote(get_arg("url")))
+	noimg = get_arg("noimg") == "true"
 	if len(d) > 0:
 		dh = get_dhash_b14(d)
 		if save_image:
 			save_img(d, img_dir)
 			print("Save success.")
-		return d, 200, {"Content-Type": "image/webp", "Class": c, "DHash": quote(dh)}
+		if noimg: return {"img": dh, "class": c}
+		else: return d, 200, {"Content-Type": "image/webp", "Class": c, "DHash": quote(dh)}
 
 @app.route("/classdat", methods=['POST'])
 async def upload() -> dict:
