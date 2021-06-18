@@ -26,7 +26,7 @@ def init_model(m):
 	if torch.cuda.is_available(): m.cuda()
 
 def load_checkpoint(filepath):
-	checkpoint = torch.load(filepath)
+	checkpoint = torch.load(filepath) if torch.cuda.is_available() else torch.load(filepath, map_location=torch.device('cpu'))
 	model = checkpoint['model']  # 提取网络结构
 	model.load_state_dict(checkpoint['model_state_dict'])  # 加载网络权重参数
 	for parameter in model.parameters():
