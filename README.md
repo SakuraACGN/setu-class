@@ -1,6 +1,11 @@
 # setu-class
 Setu classification.
 
+# Command line
+```bash
+python3 server(_flask).py <host> <port> <save_img:true/false> (img_dir/server_uid)
+```
+
 # API
 
 #### 1. Dice from url
