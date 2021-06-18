@@ -34,3 +34,6 @@ python3 server(_flask).py <host> <port> <save_img:true/false> (img_dir/server_ui
 ```json
 {"result": [{"name": "name1", "img": "dhash1", "class": 0}, ...]}
 ```
+
+# Thanks
+- [露娜](https://github.com/cherry-luna)
