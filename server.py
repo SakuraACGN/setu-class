@@ -13,6 +13,7 @@ app = Quart(__name__)
 server_uid = 0
 img_dir = ""
 save_image = False
+valid_api_list = ["https://api.pixivweb.com/anime18r.php?return=img"]
 
 def get_arg(key: str) -> str:
 	return request.args.get(key)
@@ -20,11 +21,12 @@ def get_arg(key: str) -> str:
 @app.route("/dice", methods=['GET'])
 async def dice() -> dict:
 	global img_dir
-	c, d = predict_url(unquote(get_arg("url")))
+	url = unquote(get_arg("url"))
+	c, d = predict_url(url)
 	noimg = get_arg("noimg") == "true"
 	if len(d) > 0:
 		dh = get_dhash_b14(d)
-		if save_image:
+		if save_image and url in valid_api_list:
 			save_img(d, img_dir)
 			print("Save success.")
 		if noimg: return {"img": dh, "class": c}
