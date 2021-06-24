@@ -70,7 +70,6 @@ def handle_client():
 
 if __name__ == '__main__':
 	if len(sys.argv) == 5:
-		'''
 		if os.fork() == 0:		#创建daemon
 			os.setsid()
 			#创建孙子进程，而后子进程退出
@@ -93,6 +92,4 @@ if __name__ == '__main__':
 			if pid < 0: print("Fork error!")
 			else: handle_client()
 		else: print("Creating daemon...")
-		'''
-		handle_client()
 	else: print("Usage: <host> <port> <save_img:true/false> (img_dir/server_uid)")
