@@ -34,7 +34,7 @@ def save_img(datas: bytes, image_dir: str) -> dict:
 		if is_converted: converted.seek(0)
 		with open(fn, 'wb') as f: copyfileobj(converted, f) if is_converted else f.write(datas)
 		if is_converted: converted.close()
-		return {"stat":"success", "img": quote(fname)}
+		return {"stat":"success", "img": fname}
 	else:
 		print("[OLD]")
-		return {"stat":"exist", "img": quote(img_name)}
+		return {"stat":"exist", "img": img_name}

@@ -29,8 +29,8 @@ def dice() -> dict:
 	if len(d) > 0:
 		dh = get_dhash_b14(d)
 		if save_image and url in valid_api_list:
-			save_img(d, img_dir)
-			print("Save success.")
+			r = save_img(d, img_dir)
+			if r["stat"] == "exist": dh = r["img"]
 		if noimg: return {"img": dh, "class": c}
 		else: return d, 200, {"Content-Type": "image/webp", "Class": c, "DHash": quote(dh)}
 
