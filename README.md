@@ -3,8 +3,11 @@ Setu classification.
 
 # Command line
 ```bash
-python3 server(_flask).py <host> <port> <save_img:true/false> (img_dir/server_uid)
+python3 server_flask.py <host> <port> <valid_img_save_dir> <invalid_img_save_dir>
 ```
+
+- **valid_img_save_dir**: the image got from valid api list.
+- **invalid_img_save_dir**: the image got beyond valid api list.
 
 # API
 
