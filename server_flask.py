@@ -12,9 +12,8 @@ from img import get_dhash_b14, save_img
 
 app = Flask(__name__)
 MAXBUFFSZ = 16*1024*1024
-server_uid = 0
 img_dir = ""
-save_image = False
+invalid_img_dir = ""
 valid_api_list = ["https://api.pixivweb.com/anime18r.php?return=img"]
 
 def get_arg(key: str) -> str:
@@ -28,9 +27,10 @@ def dice() -> dict:
 	noimg = get_arg("noimg") == "true"
 	if len(d) > 0:
 		dh = get_dhash_b14(d)
-		if save_image and url in valid_api_list:
+		if url in valid_api_list:
 			r = save_img(d, img_dir)
 			if r["stat"] == "exist": dh = r["img"]
+		else: save_img(d, invalid_img_dir)
 		if noimg: return {"img": dh, "class": c}
 		else: return d, 200, {"Content-Type": "image/webp", "Class": c, "DHash": quote(dh)}
 
@@ -52,25 +52,18 @@ def upform() -> dict:
 		re.append({"name":f.filename, "img": get_dhash_b14(f), "class": predict_data(f)})
 	return {"result": re}
 
-@app.before_first_request
-def setuid() -> None:
-	global server_uid
-	if server_uid > 0:		#监听后降权
-		os.setuid(server_uid)
-
 def flush_io() -> None:
 	sys.stdout.flush()
 	sys.stderr.flush()
 
 def handle_client():
-	global server_uid, img_dir, save_image
+	global img_dir, invalid_img_dir
 	host = sys.argv[1]
 	port = int(sys.argv[2])
-	save_image = sys.argv[3] == "true"
-	if save_image:
-		img_dir = sys.argv[4]
-		if img_dir[-1] != '/': img_dir += "/"
-	else: server_uid = int(sys.argv[4])
+	img_dir = sys.argv[3]
+	invalid_img_dir = sys.argv[4]
+	if img_dir[-1] != '/': img_dir += "/"
+	if invalid_img_dir[-1] != '/': invalid_img_dir += "/"
 	print("Starting SC at:", host, port)
 	init_dll_in('/usr/local/lib/')
 	init_model(TRAINED_MODEL)
@@ -100,4 +93,4 @@ if __name__ == '__main__':
 			if pid < 0: print("Fork error!")
 			else: handle_client()
 		else: print("Creating daemon...")
-	else: print("Usage: <host> <port> <save_img:true/false> (img_dir/server_uid)")
+	else: print("Usage: <host> <port> <valid_img_save_dir> <invalid_img_save_dir>")
