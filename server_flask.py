@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from classify.predict import get_loli_url
 from base14.base14 import init_dll_in
 from gevent import pywsgi
 from flask import Flask, request
@@ -22,12 +23,13 @@ def get_arg(key: str) -> str:
 @app.route("/dice", methods=['GET'])
 def dice() -> dict:
 	global img_dir
-	url = unquote(get_arg("url"))
+	loli = get_arg("loli") == "true"
+	url = get_loli_url() if loli else unquote(get_arg("url"))
 	c, d = predict_url(url)
 	noimg = get_arg("noimg") == "true"
 	if len(d) > 0:
 		dh = get_dhash_b14(d)
-		if url in valid_api_list:
+		if url in valid_api_list or loli:
 			r = save_img(d, img_dir)
 			if r["stat"] == "exist": dh = r["img"]
 		else: save_img(d, invalid_img_dir)

@@ -18,7 +18,7 @@ from time import time
 model = ""
 pool = PoolManager()
 
-def init_model(m):
+def init_model(m) -> None:
 	global model
 	# 读入模型
 	model = load_checkpoint(m)
@@ -72,11 +72,15 @@ def tta_predict_files(imgs):
 	return _id, pred_list
 
 last_req_time = 0
-def predict_url(url):
-	global model, pool, last_req_time
+def clear_pool() -> None:
+	global pool, last_req_time
 	if time() - last_req_time > 60:
 		pool.clear()
 		last_req_time = time()
+
+def predict_url(url):
+	global model, pool
+	clear_pool()
 	r = pool.request('GET', url, preload_content=False)
 	print("Get request.")
 	d = r.read()
@@ -94,9 +98,21 @@ def predict_url(url):
 			print("Convert success.")
 		return int(torch.argmax(out, dim=1).cpu().item()), d
 
-def predict_data(dataio):
+def predict_data(dataio) -> int:
 	with Image.open(dataio).convert('RGB') as img:
 		img = get_test_transform(size=cfg.INPUT_SIZE)(img).unsqueeze(0)
 		if torch.cuda.is_available(): img = img.cuda()
 		with torch.no_grad(): out = model(img)
 		return int(torch.argmax(out, dim=1).cpu().item())
+
+LOLI_API_URL = "https://api.lolicon.app/setu/v2?r18=2"
+def get_loli_url() -> str:
+	global pool
+	clear_pool()
+	r = pool.request('GET', LOLI_API_URL, preload_content=False)
+	print("Get request.")
+	d = r.read().decode()
+	r.release_conn()
+	d = d[d.index("\"urls\":{\"original\":\"")+20:]
+	d = d[:d.index("\"}")]
+	return d

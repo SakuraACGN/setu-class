@@ -131,5 +131,6 @@ dmypy.json
 .DS_Store
 trained/sensei.pth
 imgs
+cust-imgs
 log.txt
 log_err.txt
