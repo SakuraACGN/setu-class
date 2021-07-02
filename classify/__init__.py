@@ -1,1 +1,1 @@
-from .predict import init_model, predict_url, predict_data, predict_files, get_loli_url
+from .predict import init_model, predict_url, predict_data, predict_files

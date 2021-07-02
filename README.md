@@ -14,13 +14,14 @@ python3 server_flask.py <host> <port> <valid_img_save_dir> <invalid_img_save_dir
 #### 1. Dice from url
 > /dice?url=http://random.api.url
 
-> optional: noimg=true
+> optional: noimg=true loli=true
 
 
 1. The classification is returned in headers, which named `Class`.
 2. The http content is a webp image.
 3. There are also a `DHash` value returned in headers and being encoded by `base16384`.
 4. If noimg=true is set, the server will only return json in API 2.
+5. If loli=true is set, the server will use lolicon api and ignore url parameter.
 
 #### 2. Classify posted data
 > /classdat

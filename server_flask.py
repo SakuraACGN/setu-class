@@ -24,12 +24,12 @@ def get_arg(key: str) -> str:
 def dice() -> dict:
 	global img_dir
 	loli = get_arg("loli") == "true"
-	url = get_loli_url() if loli else unquote(get_arg("url"))
-	c, d = predict_url(url)
+	url = "" if loli else unquote(get_arg("url"))
+	c, d = predict_url(url, loli)
 	noimg = get_arg("noimg") == "true"
 	if len(d) > 0:
 		dh = get_dhash_b14(d)
-		if url in valid_api_list or loli:
+		if loli or url in valid_api_list:
 			r = save_img(d, img_dir)
 			if r["stat"] == "exist": dh = r["img"]
 		else: save_img(d, invalid_img_dir)

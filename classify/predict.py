@@ -26,7 +26,7 @@ def init_model(m) -> None:
 	##将模型放置在gpu上运行
 	if torch.cuda.is_available(): m.cuda()
 
-def load_checkpoint(filepath):
+def load_checkpoint(filepath: str):
 	checkpoint = torch.load(filepath) if torch.cuda.is_available() else torch.load(filepath, map_location=torch.device('cpu'))
 	model = checkpoint['model']  # 提取网络结构
 	model.load_state_dict(checkpoint['model_state_dict'])  # 加载网络权重参数
@@ -35,7 +35,7 @@ def load_checkpoint(filepath):
 	model.eval()
 	return model
 
-def predict_files(imgs):
+def predict_files(imgs: list):
 	global model
 	pred_list, _id = [], []
 	for i in tqdm(range(len(imgs))):
@@ -51,7 +51,7 @@ def predict_files(imgs):
 			pred_list.append(prediction)
 	return _id, pred_list
 
-def tta_predict_files(imgs):
+def tta_predict_files(imgs: list):
 	global model
 	pred_list, _id = [], []
 	for i in tqdm(range(len(imgs))):
@@ -78,10 +78,21 @@ def clear_pool() -> None:
 		pool.clear()
 		last_req_time = time()
 
-def predict_url(url):
+LOLI_API_URL = "https://api.lolicon.app/setu/v2?r18=2&proxy=null"
+def get_loli_url() -> str:
+	global pool
+	r = pool.request('GET', LOLI_API_URL, preload_content=False)
+	print("Get request.")
+	d = r.read().decode()
+	r.release_conn()
+	d = d[d.index("\"urls\":{\"original\":\"")+20:]
+	d = d[:d.index("\"}")]
+	return d
+
+def predict_url(url: str, loli: bool):
 	global model, pool
 	clear_pool()
-	r = pool.request('GET', url, preload_content=False)
+	r = pool.request('GET', get_loli_url() if loli else url, headers={"Referer":"https://www.pixiv.net"} if loli else None, preload_content=False)
 	print("Get request.")
 	d = r.read()
 	r.release_conn()
@@ -104,15 +115,3 @@ def predict_data(dataio) -> int:
 		if torch.cuda.is_available(): img = img.cuda()
 		with torch.no_grad(): out = model(img)
 		return int(torch.argmax(out, dim=1).cpu().item())
-
-LOLI_API_URL = "https://api.lolicon.app/setu/v2?r18=2"
-def get_loli_url() -> str:
-	global pool
-	clear_pool()
-	r = pool.request('GET', LOLI_API_URL, preload_content=False)
-	print("Get request.")
-	d = r.read().decode()
-	r.release_conn()
-	d = d[d.index("\"urls\":{\"original\":\"")+20:]
-	d = d[:d.index("\"}")]
-	return d
