@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-from classify.predict import get_loli_url
 from base14.base14 import init_dll_in
 from gevent import pywsgi
 from flask import Flask, request
