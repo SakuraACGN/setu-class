@@ -68,7 +68,7 @@ def get_loli_url() -> str:
 	d = d[:d.index("\"}")]
 	return d
 
-def predict_url(url: str, loli: bool, newcls: bool):
+def predict_url(url: str, loli: bool):
 	global model, pool
 	clear_pool()
 	r = pool.request('GET', get_loli_url() if loli else url, headers={"Referer":"https://www.pixiv.net"} if loli else None, preload_content=False)
