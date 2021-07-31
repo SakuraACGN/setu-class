@@ -105,10 +105,18 @@ def predict_url(url: str, loli: bool, newcls: bool):
 		if newcls:
 			if n > 3 and n < 6 and e > 5: p = 8
 			else: p = n
-			if r18 and p < 6: p = 8
 		elif e > 2 and n < 3: p = n
 		else: p = e
-		if r18 and p < 5: p = 6
+		if loli:
+    		if r18:
+    			if newcls:
+    				if p < 6: p = 8
+				elif p < 5: p = 6
+			else:
+    			if newcls:
+    				if p > 5: p = 5
+				else:
+    				if p > 4: p = 4
 		return p, d
 
 '''
