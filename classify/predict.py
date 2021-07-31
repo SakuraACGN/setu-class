@@ -94,7 +94,7 @@ def get_loli_url() -> str:
 	d = d[:d.index("\"}")]
 	return d
 
-def predict_url(url: str, loli: bool):
+def predict_url(url: str, loli: bool, newcls: bool):
 	global model, pool
 	clear_pool()
 	r = pool.request('GET', get_loli_url() if loli else url, headers={"Referer":"https://www.pixiv.net"} if loli else None, preload_content=False)
@@ -116,10 +116,14 @@ def predict_url(url: str, loli: bool):
 			print("Convert success.")
 		n = int(torch.argmax(out, dim=1).cpu().item())
 		e = int(torch.argmax(oue, dim=1).cpu().item())
-		if n > 3 and n < 6 and e > 4: p = 6 if e == 5 else 8
-		else: p = n
+		if newcls:
+			if n > 3 and n < 6 and e > 4: p = 6 if e == 5 else 8
+			else: p = n
+		elif e > 4 and n < 4: p = n
+		else: p = e
 		return p, d
 
+'''
 def predict_data(dataio) -> int:
 	with Image.open(dataio).convert('RGB') as img:
 		img = get_test_transform(size=cfg.INPUT_SIZE)(img).unsqueeze(0)
@@ -132,3 +136,4 @@ def predict_data(dataio) -> int:
 		if n > 3 and n < 6 and e > 4: p = 6 if e == 5 else 8
 		else: p = n
 		return p
+'''

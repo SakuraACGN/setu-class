@@ -24,8 +24,9 @@ def dice() -> dict:
 	global img_dir
 	loli = get_arg("loli") == "true"
 	url = "" if loli else unquote(get_arg("url"))
-	c, d = predict_url(url, loli)
 	noimg = get_arg("noimg") == "true"
+	newcls = get_arg("class") == "9"
+	c, d = predict_url(url, loli, newcls)
 	if len(d) > 0:
 		dh = get_dhash_b14(d)
 		if loli or url in valid_api_list:
@@ -35,6 +36,7 @@ def dice() -> dict:
 		if noimg: return {"img": dh, "class": c}
 		else: return d, 200, {"Content-Type": "image/webp", "Class": c, "DHash": quote(dh)}
 
+'''
 @app.route("/classdat", methods=['POST'])
 def upload() -> dict:
 	length = int(request.headers.get('Content-Length'))
@@ -52,6 +54,7 @@ def upform() -> dict:
 	for f in request.files.getlist("img"):
 		re.append({"name":f.filename, "img": get_dhash_b14(f), "class": predict_data(f)})
 	return {"result": re}
+'''
 
 def flush_io() -> None:
 	sys.stdout.flush()
