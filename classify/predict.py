@@ -38,7 +38,7 @@ def load_checkpoint(filepath: str):
 	return model
 
 def predict_files(imgs: list):
-	global model
+	global model, moder
 	pred_list, _id = [], []
 	for i in tqdm(range(len(imgs))):
 		img_path = imgs[i].strip()
@@ -77,7 +77,7 @@ def get_loli_url() -> str:
 	return d
 
 def predict_url(url: str, loli: bool, newcls: bool):
-	global model, pool
+	global model, moder, pool
 	clear_pool()
 	r = pool.request('GET', get_loli_url() if loli else url, headers={"Referer":"https://www.pixiv.net"} if loli else None, preload_content=False)
 	print("Get request.")
@@ -107,6 +107,7 @@ def predict_url(url: str, loli: bool, newcls: bool):
 
 '''
 def predict_data(dataio) -> int:
+    global model, moder
 	with Image.open(dataio).convert('RGB') as img:
 		img = get_test_transform(size=cfg.INPUT_SIZE)(img).unsqueeze(0)
 		if torch.cuda.is_available(): img = img.cuda()
