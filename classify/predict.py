@@ -16,14 +16,12 @@ from urllib3 import PoolManager
 from time import time
 
 model = ""
-moder = ""
 pool = PoolManager()
 
-def init_model(nor, ero) -> None:
-	global model, moder
+def init_model(m) -> None:
+	global model
 	# 读入模型
-	model = load_checkpoint(nor)
-	moder = load_checkpoint(ero)
+	model = load_checkpoint(m)
 	print('..... Finished loading model! ......')
 	##将模型放置在gpu上运行
 	if torch.cuda.is_available(): m.cuda()
