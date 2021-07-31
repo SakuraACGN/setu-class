@@ -93,7 +93,7 @@ def predict_url(url: str, loli: bool, newcls: bool, withr18: bool):
 		if torch.cuda.is_available(): imgt = imgt.cuda()
 		with torch.no_grad():
 			out = model(imgt)
-			oue = moder(imgt)
+			if not newcls: oue = moder(imgt)
 		if img.format != "WEBP":
 			converted = BytesIO()
 			img.save(converted, "WEBP")
@@ -101,9 +101,10 @@ def predict_url(url: str, loli: bool, newcls: bool, withr18: bool):
 			d = converted.read()
 			print("Convert success.")
 		n = int(torch.argmax(out, dim=1).cpu().item())
-		e = int(torch.argmax(oue, dim=1).cpu().item())
-		p = n if newcls else e
-		if not newcls and e > 2 and n < 3: p = n
+		if not newcls:
+    		p = int(torch.argmax(oue, dim=1).cpu().item())
+			if p > 2 and n < 3: p = n
+		else: p = n
 		if loli:
 			if r18:
 				if newcls:
