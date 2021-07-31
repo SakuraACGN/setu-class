@@ -102,26 +102,24 @@ def predict_url(url: str, loli: bool, newcls: bool):
 			print("Convert success.")
 		n = int(torch.argmax(out, dim=1).cpu().item())
 		e = int(torch.argmax(oue, dim=1).cpu().item())
-		if newcls:
-			if n > 3 and n < 6 and e > 5: p = 8
-			else: p = n
-		elif e > 2 and n < 3: p = n
-		else: p = e
+		if n > 3 and n < 6 and e > 5: p = 8 if newcls else 6
+		else: p = n if newcls else e
+		if not newcls and e > 2 and n < 3: p = n
 		if loli:
-    		if r18:
-    			if newcls:
-    				if p < 6: p = 8
+			if r18:
+				if newcls:
+					if p < 6: p = 8
 				elif p < 5: p = 6
 			else:
-    			if newcls:
-    				if p > 5: p = 5
+				if newcls:
+					if p > 5: p = 5
 				else:
-    				if p > 4: p = 4
+					if p > 4: p = 4
 		return p, d
 
 '''
 def predict_data(dataio) -> int:
-    global model, moder
+	global model, moder
 	with Image.open(dataio).convert('RGB') as img:
 		img = get_test_transform(size=cfg.INPUT_SIZE)(img).unsqueeze(0)
 		if torch.cuda.is_available(): img = img.cuda()
