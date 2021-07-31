@@ -102,7 +102,7 @@ def predict_url(url: str, loli: bool, newcls: bool):
 			print("Convert success.")
 		n = int(torch.argmax(out, dim=1).cpu().item())
 		e = int(torch.argmax(oue, dim=1).cpu().item())
-		if n > 3 and n < 6 and e > 5: p = 8 if newcls else 6
+		if n > 3 and n < 6 and e > 5: p = 8 if newcls else e
 		else: p = n if newcls else e
 		if not newcls and e > 2 and n < 3: p = n
 		if loli:
