@@ -24,7 +24,7 @@ python3 server_flask.py <host> <port> <valid_img_save_dir> <invalid_img_save_dir
 5. If loli=true is set, the server will use lolicon api and ignore url parameter.
 6. If class=9 is set, the server will return class from 0 to 8.
 
-#### 2. Classify posted data
+#### 2. Classify posted data (commented)
 > /classdat
 
 1. Post an image to this url.
@@ -34,7 +34,7 @@ python3 server_flask.py <host> <port> <valid_img_save_dir> <invalid_img_save_dir
 {"img": "dhash", "class": 0}
 ```
 
-#### 3. Classify posted form
+#### 3. Classify posted form (commented)
 > /classform
 
 1. Post multiple images in a form to this url.

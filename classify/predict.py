@@ -12,7 +12,6 @@ from PIL import Image
 from collections import Counter
 from config import cfg
 from data import get_test_transform
-# from data import tta_test_transform
 from urllib3 import PoolManager
 from time import time
 
@@ -50,29 +49,14 @@ def predict_files(imgs: list):
 			# print(type(img))
 			img = get_test_transform(size=cfg.INPUT_SIZE)(img).unsqueeze(0)
 			if torch.cuda.is_available(): img = img.cuda()
-			with torch.no_grad(): out = model(img)
-			prediction = torch.argmax(out, dim=1).cpu().item()
-			pred_list.append(prediction)
-	return _id, pred_list
-
-def tta_predict_files(imgs: list):
-	global model
-	pred_list, _id = [], []
-	for i in tqdm(range(len(imgs))):
-		img_path = imgs[i].strip()
-		# print(img_path)
-		_id.append(os.path.basename(img_path).split('.')[0])
-		with Image.open(img_path).convert('RGB') as img1:
-			# print(type(img))
-			pred = []
-			for i in range(8):
-				img = tta_test_transform(size=cfg.INPUT_SIZE)(img1).unsqueeze(0)
-				if torch.cuda.is_available(): img = img.cuda()
-				with torch.no_grad(): out = model(img)
-				prediction = torch.argmax(out, dim=1).cpu().item()
-				pred.append(prediction)
-			res = Counter(pred).most_common(1)[0][0]
-			pred_list.append(res)
+			with torch.no_grad():
+				out = model(img)
+				oue = moder(img)
+			n = int(torch.argmax(out, dim=1).cpu().item())
+			e = int(torch.argmax(oue, dim=1).cpu().item())
+			if n > 3 and n < 6 and e > 4: p = 6 if e == 5 else 8
+			else: p = n
+			pred_list.append(p)
 	return _id, pred_list
 '''
 
