@@ -8,26 +8,29 @@ from io import BytesIO
 import torch
 import os
 from PIL import Image
-from tqdm import tqdm
+# from tqdm import tqdm
 from collections import Counter
 from config import cfg
-from data import tta_test_transform, get_test_transform
+from data import get_test_transform
+# from data import tta_test_transform
 from urllib3 import PoolManager
 from time import time
 
 model = ""
+moder = ""
 pool = PoolManager()
 
-def init_model(m) -> None:
-	global model
+def init_model(nor, ero) -> None:
+	global model, moder
 	# 读入模型
-	model = load_checkpoint(m)
+	model = load_checkpoint(nor)
+	moder = load_checkpoint(ero)
 	print('..... Finished loading model! ......')
 	##将模型放置在gpu上运行
 	if torch.cuda.is_available(): m.cuda()
 
 def load_checkpoint(filepath: str):
-	checkpoint = torch.load(filepath) if torch.cuda.is_available() else torch.load(filepath, map_location=torch.device('cpu'))
+    	checkpoint = torch.load(filepath) if torch.cuda.is_available() else torch.load(filepath, map_location=torch.device('cpu'))
 	model = checkpoint['model']  # 提取网络结构
 	model.load_state_dict(checkpoint['model_state_dict'])  # 加载网络权重参数
 	for parameter in model.parameters():
@@ -35,6 +38,7 @@ def load_checkpoint(filepath: str):
 	model.eval()
 	return model
 
+'''
 def predict_files(imgs: list):
 	global model
 	pred_list, _id = [], []
@@ -70,6 +74,7 @@ def tta_predict_files(imgs: list):
 			res = Counter(pred).most_common(1)[0][0]
 			pred_list.append(res)
 	return _id, pred_list
+'''
 
 last_req_time = 0
 def clear_pool() -> None:
@@ -100,18 +105,30 @@ def predict_url(url: str, loli: bool):
 	with Image.open(BytesIO(d)).convert('RGB') as img:
 		imgt = get_test_transform(size=cfg.INPUT_SIZE)(img).unsqueeze(0)
 		if torch.cuda.is_available(): imgt = imgt.cuda()
-		with torch.no_grad(): out = model(imgt)
+		with torch.no_grad():
+			out = model(imgt)
+			oue = moder(imgt)
 		if img.format != "WEBP":
 			converted = BytesIO()
 			img.save(converted, "WEBP")
 			converted.seek(0)
 			d = converted.read()
 			print("Convert success.")
-		return int(torch.argmax(out, dim=1).cpu().item()), d
+		n = int(torch.argmax(out, dim=1).cpu().item())
+		e = int(torch.argmax(oue, dim=1).cpu().item())
+		if n > 3 and n < 6 and e > 4: p = 6 if e == 5 else 8
+		else: p = n
+		return p, d
 
 def predict_data(dataio) -> int:
 	with Image.open(dataio).convert('RGB') as img:
 		img = get_test_transform(size=cfg.INPUT_SIZE)(img).unsqueeze(0)
 		if torch.cuda.is_available(): img = img.cuda()
-		with torch.no_grad(): out = model(img)
-		return int(torch.argmax(out, dim=1).cpu().item())
+		with torch.no_grad():
+			out = model(img)
+			oue = moder(img)
+		n = int(torch.argmax(out, dim=1).cpu().item())
+		e = int(torch.argmax(oue, dim=1).cpu().item())
+		if n > 3 and n < 6 and e > 4: p = 6 if e == 5 else 8
+		else: p = n
+		return p
