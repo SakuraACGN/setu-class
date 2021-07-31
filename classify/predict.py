@@ -66,20 +66,24 @@ def clear_pool() -> None:
 		last_req_time = time()
 
 LOLI_API_URL = "https://api.lolicon.app/setu/v2?r18=2&proxy=null"
-def get_loli_url() -> str:
+def get_loli_url():
 	global pool
 	r = pool.request('GET', LOLI_API_URL, preload_content=False)
 	print("Get request.")
 	d = r.read().decode()
 	r.release_conn()
+	r = d.index("\"r18\":")
+	r = d[r+6:r+10] == "true"
 	d = d[d.index("\"urls\":{\"original\":\"")+20:]
 	d = d[:d.index("\"}")]
-	return d
+	return d, r
 
 def predict_url(url: str, loli: bool, newcls: bool):
 	global model, moder, pool
 	clear_pool()
-	r = pool.request('GET', get_loli_url() if loli else url, headers={"Referer":"https://www.pixiv.net"} if loli else None, preload_content=False)
+	if loli: url, r18 = get_loli_url()
+	else: r18 = False
+	r = pool.request('GET', url, headers={"Referer":"https://www.pixiv.net"} if loli else None, preload_content=False)
 	print("Get request.")
 	d = r.read()
 	r.release_conn()
@@ -101,8 +105,10 @@ def predict_url(url: str, loli: bool, newcls: bool):
 		if newcls:
 			if n > 3 and n < 6 and e > 5: p = 8
 			else: p = n
+			if r18 and p < 6: p = 8
 		elif e > 2 and n < 3: p = n
 		else: p = e
+		if r18 and p < 5: p = 6
 		return p, d
 
 '''
