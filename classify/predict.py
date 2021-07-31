@@ -65,10 +65,11 @@ def clear_pool() -> None:
 		pool.clear()
 		last_req_time = time()
 
-LOLI_API_URL = "https://api.lolicon.app/setu/v2?r18=2&proxy=null"
-def get_loli_url():
+LOLI_API_URL_R18 = "https://api.lolicon.app/setu/v2?r18=2&proxy=null"
+LOLI_API_URL_NORM = "https://api.lolicon.app/setu/v2?proxy=null"
+def get_loli_url(withr18: bool):
 	global pool
-	r = pool.request('GET', LOLI_API_URL, preload_content=False)
+	r = pool.request('GET', LOLI_API_URL_R18 if withr18 else LOLI_API_URL_NORM, preload_content=False)
 	print("Get request.")
 	d = r.read().decode()
 	r.release_conn()
@@ -78,10 +79,10 @@ def get_loli_url():
 	d = d[:d.index("\"}")]
 	return d, r
 
-def predict_url(url: str, loli: bool, newcls: bool):
+def predict_url(url: str, loli: bool, newcls: bool, withr18: bool):
 	global model, moder, pool
 	clear_pool()
-	if loli: url, r18 = get_loli_url()
+	if loli: url, r18 = get_loli_url(withr18)
 	else: r18 = False
 	r = pool.request('GET', url, headers={"Referer":"https://www.pixiv.net"} if loli else None, preload_content=False)
 	print("Get request.")
