@@ -7,7 +7,7 @@ import sys, os
 from base14 import init_dll_in
 from classify import init_model, predict_url
 # from classify import predict_data
-from config import TRAINED_MODEL_NOR, TRAINED_MODEL_ERO
+from config import TRAINED_MODEL
 from io import BytesIO
 from img import get_dhash_b14, save_img
 
@@ -71,7 +71,7 @@ def handle_client():
 	if invalid_img_dir[-1] != '/': invalid_img_dir += "/"
 	print("Starting SC at:", host, port)
 	init_dll_in('/usr/local/lib/')
-	init_model(TRAINED_MODEL_NOR, TRAINED_MODEL_ERO)
+	init_model(TRAINED_MODEL)
 	pywsgi.WSGIServer((host, port), app).serve_forever()
 
 if __name__ == '__main__':

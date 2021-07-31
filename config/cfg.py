@@ -10,5 +10,4 @@ home = "."
 INPUT_SIZE = 256
 
 ##训练完成，权重文件的保存路径,默认保存在trained_model下
-TRAINED_MODEL_NOR = home + "/trained/nor.pth"
-TRAINED_MODEL_ERO = home + "/trained/ero.pth"
+TRAINED_MODEL = home + "/trained/epoch_8.pth"

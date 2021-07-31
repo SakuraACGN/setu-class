@@ -48,14 +48,8 @@ def predict_files(imgs: list):
 			# print(type(img))
 			img = get_test_transform(size=cfg.INPUT_SIZE)(img).unsqueeze(0)
 			if torch.cuda.is_available(): img = img.cuda()
-			with torch.no_grad():
-				out = model(img)
-				oue = moder(img)
-			n = int(torch.argmax(out, dim=1).cpu().item())
-			e = int(torch.argmax(oue, dim=1).cpu().item())
-			if n > 3 and n < 6 and e > 5: p = 8
-			else: p = n
-			pred_list.append(p + n * 10 + e * 100)
+			with torch.no_grad(): out = model(img)
+			pred_list.append(int(torch.argmax(out, dim=1).cpu().item()))
 	return _id, pred_list
 
 last_req_time = 0
@@ -87,23 +81,14 @@ def predict_url(url: str, loli: bool, newcls: bool):
 	with Image.open(BytesIO(d)).convert('RGB') as img:
 		imgt = get_test_transform(size=cfg.INPUT_SIZE)(img).unsqueeze(0)
 		if torch.cuda.is_available(): imgt = imgt.cuda()
-		with torch.no_grad():
-			out = model(imgt)
-			oue = moder(imgt)
+		with torch.no_grad(): out = model(imgt)
 		if img.format != "WEBP":
 			converted = BytesIO()
 			img.save(converted, "WEBP")
 			converted.seek(0)
 			d = converted.read()
 			print("Convert success.")
-		n = int(torch.argmax(out, dim=1).cpu().item())
-		e = int(torch.argmax(oue, dim=1).cpu().item())
-		if newcls:
-			if n > 3 and n < 6 and e > 5: p = 8
-			else: p = n
-		elif e > 2 and n < 3: p = n
-		else: p = e
-		return p, d
+		return int(torch.argmax(out, dim=1).cpu().item()), d
 
 '''
 def predict_data(dataio) -> int:

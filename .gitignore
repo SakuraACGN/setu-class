@@ -129,7 +129,7 @@ dmypy.json
 .pyre/
 
 .DS_Store
-trained/sensei.pth
+trained
 imgs
 cust-imgs
 log.txt
