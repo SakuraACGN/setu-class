@@ -8,7 +8,7 @@ from io import BytesIO
 import torch
 import os
 from PIL import Image
-# from tqdm import tqdm
+from tqdm import tqdm
 from collections import Counter
 from config import cfg
 from data import get_test_transform
@@ -37,7 +37,6 @@ def load_checkpoint(filepath: str):
 	model.eval()
 	return model
 
-'''
 def predict_files(imgs: list):
 	global model
 	pred_list, _id = [], []
@@ -54,11 +53,10 @@ def predict_files(imgs: list):
 				oue = moder(img)
 			n = int(torch.argmax(out, dim=1).cpu().item())
 			e = int(torch.argmax(oue, dim=1).cpu().item())
-			if n > 3 and n < 6 and e > 4: p = 6 if e == 5 else 8
+			if n > 3 and n < 6 and e == 5: p = 8
 			else: p = n
-			pred_list.append(p)
+			pred_list.append(p + n * 10 + e * 100)
 	return _id, pred_list
-'''
 
 last_req_time = 0
 def clear_pool() -> None:
@@ -101,7 +99,7 @@ def predict_url(url: str, loli: bool, newcls: bool):
 		n = int(torch.argmax(out, dim=1).cpu().item())
 		e = int(torch.argmax(oue, dim=1).cpu().item())
 		if newcls:
-			if n > 3 and n < 6 and e > 4: p = 6 if e == 5 else 8
+			if n > 3 and n < 6 and e == 5: p = 8
 			else: p = n
 		elif e > 4 and n < 4: p = n
 		else: p = e

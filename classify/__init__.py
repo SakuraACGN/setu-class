@@ -1,2 +1,2 @@
-from .predict import init_model, predict_url
-# from .predict import predict_data, predict_files
+from .predict import init_model, predict_url, predict_files
+# from .predict import predict_data
