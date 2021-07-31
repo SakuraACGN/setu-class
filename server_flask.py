@@ -26,7 +26,7 @@ def dice() -> dict:
 	loli = get_arg("loli") == "true"
 	url = "" if loli else unquote(get_arg("url"))
 	noimg = get_arg("noimg") == "true"
-	newcls = get_arg("class") == "9"
+	newcls = get_arg("class") == 9
 	c, d = predict_url(url, loli, newcls)
 	if len(d) > 0:
 		dh = get_dhash_b14(d)
