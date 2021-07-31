@@ -55,6 +55,7 @@ def predict_files(imgs: list):
 			e = int(torch.argmax(oue, dim=1).cpu().item())
 			if n > 3 and n < 6 and e > 5: p = 8
 			else: p = n
+			if n > 6 and e < 5: p = 5
 			pred_list.append(p + n * 10 + e * 100)
 	return _id, pred_list
 
@@ -105,7 +106,9 @@ def predict_url(url: str, loli: bool, newcls: bool, withr18: bool):
 		e = int(torch.argmax(oue, dim=1).cpu().item())
 		if n > 3 and n < 6 and e > 5: p = 8 if newcls else e
 		else: p = n if newcls else e
-		if not newcls and e > 2 and n < 3: p = n
+		if not newcls:
+			if e > 2 and n < 3: p = n
+		elif n > 6 and e < 5: p = 5
 		if loli:
 			if r18:
 				if newcls:
