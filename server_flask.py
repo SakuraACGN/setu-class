@@ -5,7 +5,8 @@ from flask import Flask, request
 from urllib.request import unquote, quote
 import sys, os
 from base14 import init_dll_in
-from classify import init_model, predict_data, predict_url
+from classify import init_model, predict_url
+# from classify import predict_data
 from config import TRAINED_MODEL_NOR, TRAINED_MODEL_ERO
 from io import BytesIO
 from img import get_dhash_b14, save_img
