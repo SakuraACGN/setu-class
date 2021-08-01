@@ -26,9 +26,11 @@ def dice() -> dict:
 	loli = get_arg("loli") == "true"
 	url = "" if loli else unquote(get_arg("url"))
 	noimg = get_arg("noimg") == "true"
-	newcls = get_arg("class") == "9"
+	clsnum = get_arg("class")
+	newcls = clsnum == "9"
+	nopredict = clsnum == "0"
 	r18 = get_arg("r18") == "true"
-	c, d = predict_url(url, loli, newcls, r18)
+	c, d = predict_url(url, loli, newcls, r18, nopredict)
 	if len(d) > 0:
 		dh = get_dhash_b14(d)
 		if loli or url in valid_api_list:

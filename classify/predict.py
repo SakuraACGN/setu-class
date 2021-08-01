@@ -78,7 +78,7 @@ def get_loli_url(withr18: bool):
 	d = d[:d.index("\"}")]
 	return d, r
 
-def predict_url(url: str, loli: bool, newcls: bool, withr18: bool):
+def predict_url(url: str, loli: bool, newcls: bool, withr18: bool, nopredict: bool):
 	global model, moder, pool
 	clear_pool()
 	if loli: url, r18 = get_loli_url(withr18)
@@ -90,21 +90,24 @@ def predict_url(url: str, loli: bool, newcls: bool, withr18: bool):
 	print("Read success.")
 	with Image.open(BytesIO(d)).convert('RGB') as img:
 		imgt = get_test_transform(size=cfg.INPUT_SIZE)(img).unsqueeze(0)
-		if torch.cuda.is_available(): imgt = imgt.cuda()
-		with torch.no_grad():
-			out = model(imgt)
-			if not newcls: oue = moder(imgt)
+		if not nopredict:
+			if torch.cuda.is_available(): imgt = imgt.cuda()
+			with torch.no_grad():
+				out = model(imgt)
+				if not newcls: oue = moder(imgt)
 		if img.format != "WEBP":
 			converted = BytesIO()
 			img.save(converted, "WEBP")
 			converted.seek(0)
 			d = converted.read()
 			print("Convert success.")
-		n = int(torch.argmax(out, dim=1).cpu().item())
-		if not newcls:
-			p = int(torch.argmax(oue, dim=1).cpu().item())
-			if p > 2 and n < 3: p = n
-		else: p = n
+		if nopredict: p = 0
+		else:
+			n = int(torch.argmax(out, dim=1).cpu().item())
+			if not newcls:
+				p = int(torch.argmax(oue, dim=1).cpu().item())
+				if p > 2 and n < 3: p = n
+			else: p = n
 		if loli:
 			if r18:
 				if newcls:
