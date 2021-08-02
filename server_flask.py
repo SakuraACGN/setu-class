@@ -12,10 +12,9 @@ from io import BytesIO
 from img import get_dhash_b14, save_img
 
 app = Flask(__name__)
-MAXBUFFSZ = 16*1024*1024
+# MAXBUFFSZ = 16*1024*1024
 img_dir = ""
 invalid_img_dir = ""
-valid_api_list = ["https://api.pixivweb.com/anime18r.php?return=img"]
 
 def get_arg(key: str) -> str:
 	return request.args.get(key)
@@ -33,7 +32,7 @@ def dice() -> dict:
 	c, d = predict_url(url, loli, newcls, r18, nopredict)
 	if len(d) > 0:
 		dh = get_dhash_b14(d)
-		if loli or url in valid_api_list:
+		if loli:
 			r = save_img(d, img_dir)
 			if r["stat"] == "exist": dh = r["img"]
 		else: save_img(d, invalid_img_dir)
