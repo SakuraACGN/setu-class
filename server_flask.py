@@ -77,30 +77,5 @@ def handle_client():
 	pywsgi.WSGIServer((host, port), app).serve_forever()
 
 if __name__ == '__main__':
-	if len(sys.argv) == 5:
-		'''
-		if os.fork() == 0:		#创建daemon
-			os.setsid()
-			#创建孙子进程，而后子进程退出
-			if os.fork() > 0: sys.exit(0)
-			#重定向标准输入流、标准输出流、标准错误
-			flush_io()
-			si = open("/dev/null", 'r')
-			so = open("./log.txt", 'w')
-			se = open("./log_err.txt", 'w')
-			os.dup2(si.fileno(), sys.stdin.fileno())
-			os.dup2(so.fileno(), sys.stdout.fileno())
-			os.dup2(se.fileno(), sys.stderr.fileno())
-			pid = os.fork()
-			while pid > 0:			#监控服务是否退出
-				#signal(SIGCHLD, SIG_IGN)
-				#signal(SIGPIPE, SIG_IGN)		# 忽略管道错误
-				os.wait()
-				print("Subprocess exited, restarting...")
-				pid = os.fork()
-			if pid < 0: print("Fork error!")
-			else: handle_client()
-		else: print("Creating daemon...")
-		'''
-		handle_client()
+	if len(sys.argv) == 5: handle_client()
 	else: print("Usage: <host> <port> <valid_img_save_dir> <invalid_img_save_dir>")
