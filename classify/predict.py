@@ -108,7 +108,7 @@ def predict_url(url: str, loli: bool, newcls: bool, withr18: bool, nopredict: bo
 			p = int(torch.argmax(oue, dim=1).cpu().item())
 			if not newcls:
 				if p > 2 and n < 3: p = n
-			elif p > 4 and n < 6 and n > 3: p = n + e - 3
+			elif p > 4 and n < 6 and n > 3: p = n + p - 3
 			else: p = n
 		if loli:
 			if r18:
