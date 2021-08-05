@@ -95,7 +95,7 @@ def predict_url(url: str, loli: bool, newcls: bool, withr18: bool, nopredict: bo
 			if torch.cuda.is_available(): imgt = imgt.cuda()
 			with torch.no_grad():
 				out = model(imgt)
-				if not newcls: oue = moder(imgt)
+				oue = moder(imgt)
 		if img.format != "WEBP":
 			converted = BytesIO()
 			img.save(converted, "WEBP")
