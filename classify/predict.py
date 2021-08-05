@@ -53,8 +53,7 @@ def predict_files(imgs: list):
 				oue = moder(img)
 			n = int(torch.argmax(out, dim=1).cpu().item())
 			e = int(torch.argmax(oue, dim=1).cpu().item())
-			if e > 4 and n < 6 and n > 3: p = n + e - 3
-			else: p = n
+			p = n
 			pred_list.append(p + n * 10 + e * 100)
 	return _id, pred_list
 
@@ -95,7 +94,7 @@ def predict_url(url: str, loli: bool, newcls: bool, withr18: bool, nopredict: bo
 			if torch.cuda.is_available(): imgt = imgt.cuda()
 			with torch.no_grad():
 				out = model(imgt)
-				oue = moder(imgt)
+				if not newcls: oue = moder(imgt)
 		if img.format != "WEBP":
 			converted = BytesIO()
 			img.save(converted, "WEBP")
@@ -105,10 +104,9 @@ def predict_url(url: str, loli: bool, newcls: bool, withr18: bool, nopredict: bo
 		if nopredict: p = 0
 		else:
 			n = int(torch.argmax(out, dim=1).cpu().item())
-			p = int(torch.argmax(oue, dim=1).cpu().item())
 			if not newcls:
+				p = int(torch.argmax(oue, dim=1).cpu().item())
 				if p > 2 and n < 3: p = n
-			elif p > 4 and n < 6 and n > 3: p = n + p - 3
 			else: p = n
 		if loli:
 			if r18:
