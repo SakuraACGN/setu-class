@@ -25,7 +25,7 @@ def save_img(datas: bytes, image_dir: str) -> dict:
 	this_hash = decode_dhash(fname)
 	hash_len = len(this_hash)
 	for img_name in all_imgs_list:
-		if hamm_img(this_hash, decode_dhash(img_name), hash_len) <= 6:
+		if hamm_img(this_hash, decode_dhash(img_name), hash_len) <= 2:
 			no_similar = False
 			break
 	if no_similar:
