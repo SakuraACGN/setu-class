@@ -116,8 +116,7 @@ def predict_url(url: str, loli: bool, newcls: bool, withr18: bool, nopredict: bo
 			else:
 				if newcls:
 					if p > 5: p = 5
-				else:
-					if p > 4: p = 4
+				elif p > 4: p = 4
 		return p, d
 
 '''
@@ -131,7 +130,5 @@ def predict_data(dataio) -> int:
 			oue = moder(img)
 		n = int(torch.argmax(out, dim=1).cpu().item())
 		e = int(torch.argmax(oue, dim=1).cpu().item())
-		if n > 3 and n < 6 and e > 4: p = 6 if e == 5 else 8
-		else: p = n
-		return p
+		return n + e * 10
 '''
